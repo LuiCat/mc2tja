@@ -21,7 +21,7 @@
             "beat": [0,0,1]
         }
     ],
-    // effect is a feature not yet implemented in Malody, which means the syntax may change in development.
+    "__comment_on_effect" : "effect is a feature not yet implemented in Malody, which means the syntax may change in development.",
     "effect": [
         {
             "signature": 5,
