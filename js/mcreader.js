@@ -35,7 +35,7 @@ var MCReader = function() {
 		}
 	}
  
- 	var MCReaderProto = {
+ 	MCReader.prototype = {
 		constructor: MCReader,
 
 		parse: function(text) {
@@ -51,9 +51,6 @@ var MCReader = function() {
 				Object.setPrototypeOf(note.beat, BeatTimeProto);
 				if (note.endbeat != null)
 					Object.setPrototypeOf(note.endbeat, BeatTimeProto);
-				if (note.style != null)
-
-				note.style
 			}
 			for (var i in this.time) {
 				var tp = this.time[i];
@@ -84,7 +81,5 @@ var MCReader = function() {
 		}
 
 	}
-
-	MCReader.prototype = MCReaderProto;
 
 })();
