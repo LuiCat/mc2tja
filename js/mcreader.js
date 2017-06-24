@@ -2,8 +2,9 @@ var MCReader = function() {
 	this.text = null;
 	this.content = {};
 	this.meta = null;
-	this.note = null;
 	this.time = null;
+	this.effect = null;
+	this.note = null;
 	this.extra = null;
 };
 
@@ -42,8 +43,9 @@ var MCReader = function() {
 			this.text = text;
 			this.content = JSON.parse(this.text);
 			this.meta = this.content.meta;
-			this.note = this.content.note;
 			this.time = this.content.time;
+			this.effect = this.content.effect;
+			this.note = this.content.note;
 			this.extra = this.content.extra;
 
 			for (var i in this.note) {
