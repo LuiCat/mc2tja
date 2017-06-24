@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>mc2tja</title>
+<style type="text/css">
+html, body {
+	width: 100%;
+	height: 100%;
+	margin: 0px;
+	padding: 0px;
+}
+.container {
+	padding: 8px;
+	width: auto;
+	height: calc(100% - 16px);
+}
+.bordered {
+	border: solid black 2px;
+}
+.details {
+	position: relative;
+	width: 100%;
+	height: calc(100% - 30px);
+}
+.origin,
+.converted {
+	float: left;
+	width: calc(50% - 20px);
+	height: 100%;
+	padding: 10px;
+}
+.scroll {
+	overflow-y: scroll;
+	height: calc(100% - 50px);
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<form action="" method="post" enctype="multipart/form-data">
+	<span>Paste online url:</span>
+	<input type="text" name="urlField" class="text" id="url-form" size="28" value="chart/luna.mc" />
+	<input type="button" name="load" class="btn" value="Load" onclick="onUrl()" />
+	<span>or select local file:</span>
+	<input type="file" name="fileField" class="file" id="file-form" accept=".mc" onchange="onFile()" size="28" />
+	<input type="button" name="convert" class="btn" value="Convert!" />
+	<input type="button" name="save" class="btn" hidden value="Save" />
+</form>
+
+<div class="details">
+	<div class="info">
+	</div>
+	<div class="origin">
+		<span>Original (MC Chart)</span>
+		<div class="scroll bordered">
+			<pre class="origin-text" id="origin-text"></pre>
+		</div>
+	</div>
+	<div class="converted">
+		<span>Converted (TJA Chart)</span>
+		<div class="scroll bordered">
+			<pre class="converted-text" id="converted-text"></pre>
+		</div>
+	</div>
+</div>
+
+<script src="js/jquery.min.js"></script>
+<script src="js/mcreader.js"></script>
+<script>
+var mc = new MCReader();
+
+function onFile()
+{
+	var url = $('#file-form').prop('files')[0];
+	if (!url) {
+		$('#origin-text').html('');
+	} else {
+		mc.readLocal(url, function() {
+			$('#origin-text').html(mc.text);
+		})
+	}
+}
+
+function onUrl()
+{
+	var url = $('#url-form').prop('value');
+	if (!url) {
+		$('#origin-text').html('');
+	} else {
+		mc.read(url, function() {
+			$('#origin-text').html(mc.text);
+		})
+	}
+}
+
+</script>
+
+</div>
+</body>
+</html>
