@@ -48,12 +48,12 @@ html, body {
 
 <form action="" method="post" enctype="multipart/form-data">
 	<span>Paste online url:</span>
-	<input type="text" name="urlField" class="text" id="url-form" size="28" value="chart/luna.mc" />
+	<input type="text" name="urlField" class="text" id="form-url" size="28" value="chart/luna.mc" />
 	<input type="button" name="load" class="btn" value="Load" onclick="onUrl()" />
 	<span>or select local file:</span>
-	<input type="file" name="fileField" class="file" id="file-form" accept=".mc" onchange="onFile()" size="28" />
+	<input type="file" name="fileField" class="file" id="form-file" accept=".mc" onchange="onFile()" size="28" />
 	<input type="button" name="convert" class="btn" value="Convert!" />
-	<input type="button" name="save" class="btn" hidden value="Save" />
+	<input type="button" name="save" class="btn" id="btn-save" hidden value="Save" />
 </form>
 
 <div class="details">
@@ -75,12 +75,14 @@ html, body {
 
 <script src="js/jquery.min.js"></script>
 <script src="js/mcreader.js"></script>
+<script src="js/tjawriter.js"></script>
 <script>
 var mc = new MCReader();
+var tja = new TJAWriter();
 
 function onFile()
 {
-	var url = $('#file-form').prop('files')[0];
+	var url = $('#form-file').prop('files')[0];
 	if (!url) {
 		$('#origin-text').html('');
 	} else {
@@ -92,12 +94,14 @@ function onFile()
 
 function onUrl()
 {
-	var url = $('#url-form').prop('value');
+	var url = $('#form-url').prop('value');
 	if (!url) {
 		$('#origin-text').html('');
 	} else {
 		mc.read(url, function() {
 			$('#origin-text').html(mc.text);
+			tja.fromMCChart(mc);
+			$('#converted-text').html(tja.generateString());
 		});
 	}
 }
