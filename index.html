@@ -21,7 +21,7 @@ html, body {
 .details {
 	position: relative;
 	width: 100%;
-	height: calc(100% - 30px);
+	height: calc(100% - 35px);
 }
 .origin,
 .converted {
@@ -33,6 +33,13 @@ html, body {
 .scroll {
 	overflow-y: scroll;
 	height: calc(100% - 50px);
+}
+.code {
+	margin: 0px;
+	border-left: solid #999999 6px;
+	font-family: Courier New, Courier, monospace;
+	font-size: 15px;
+	line-height: 18px;
 }
 </style>
 </head>
@@ -55,13 +62,13 @@ html, body {
 	<div class="origin">
 		<span>Original (MC Chart)</span>
 		<div class="scroll bordered">
-			<pre class="origin-text" id="origin-text"></pre>
+			<pre class="origin-text code" id="origin-text"></pre>
 		</div>
 	</div>
 	<div class="converted">
 		<span>Converted (TJA Chart)</span>
 		<div class="scroll bordered">
-			<pre class="converted-text" id="converted-text"></pre>
+			<pre class="converted-text code" id="converted-text"></pre>
 		</div>
 	</div>
 </div>
@@ -79,7 +86,7 @@ function onFile()
 	} else {
 		mc.readLocal(url, function() {
 			$('#origin-text').html(mc.text);
-		})
+		});
 	}
 }
 
@@ -91,7 +98,7 @@ function onUrl()
 	} else {
 		mc.read(url, function() {
 			$('#origin-text').html(mc.text);
-		})
+		});
 	}
 }
 
