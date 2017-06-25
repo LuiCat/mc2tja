@@ -18,7 +18,7 @@ var MCReader = function() {
 
 	function gcd(a, b) {
 		var t;
-		while (a != 1) {
+		while (a != 0) {
 			t = b % a;
 			b = a;
 			a = t;

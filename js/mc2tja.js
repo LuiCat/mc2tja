@@ -136,8 +136,36 @@ var mc2tja = function() {
             //tja.addProp("BALLOON", "");
 
             // Second: group notes in segments
-
             // Third: add events according to time points, scaling segments if necessary
+            //        we will do it online, so we do not have to record beat info for all bars
+
+            // -- Steps to group some notes:
+            // -- 1. Make a list of signature. Some useful functions is recommended.
+            // -- 2. Find the beginning bar. If there's notes before, go backward for some bars.
+            // -- 3. If there's remaining notes, push forward for a bar and create a segment; or else goto 5.
+            // -- 4. Join beat fractions together, and calculate the indices. Repeat from 3.
+            // -- 5. Cheers!
+
+            var barBegin = mc.meta.mode_ext.bar_begin;
+            var barBeat = barBegin;
+            
+            var notes = mc.note.slice(0);
+            notes.sort(function(a, b) {
+                return a.beat.compare(b.beat) < 0;
+            });
+
+            var signs = [];
+            for (var i in mc.effect) {
+                if (mc.effect[i].signature)
+                    signs.push({signature: mc.effect[i].signature, beat: mc.effect[i].beat});
+            }
+            signs.sort(function(a, b) {
+                return a.beat.compare(b.beat) < 0;
+            });
+
+            // ...
+
+            // Finally: just generate!
 
             this.generated = tja.generateString();
 
