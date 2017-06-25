@@ -183,21 +183,6 @@ var TJAWriter = function() {
             */
 
         },
-        
-        fromMCChart: function(mc) {
-            if (!(mc instanceof MCReader))
-                throw new TypeError('Parameter mc must be a MCWriter');
-            
-            // test code
-            this.addTestData();
-            
-            // First: fill out all necessary properties 
-
-            // Second: group notes in segments
-
-            // Third: add events according to time points, scaling segments if necessary
-
-        }
 
     }
 

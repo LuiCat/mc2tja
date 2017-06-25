@@ -76,9 +76,10 @@ html, body {
 <script src="js/jquery.min.js"></script>
 <script src="js/mcreader.js"></script>
 <script src="js/tjawriter.js"></script>
+<script src="js/mc2tja.js"></script>
 <script>
 var mc = new MCReader();
-var tja = new TJAWriter();
+var conv = new mc2tja();
 
 function onFile()
 {
@@ -100,8 +101,8 @@ function onUrl()
 	} else {
 		mc.read(url, function() {
 			$('#origin-text').html(mc.text);
-			tja.fromMCChart(mc);
-			$('#converted-text').html(tja.generateString());
+			conv.convert(mc);
+			$('#converted-text').html(conv.generated);
 		});
 	}
 }
