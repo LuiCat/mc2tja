@@ -110,6 +110,10 @@ var TJAWriter = function() {
 
         constructor: TJAWriter,
 
+        addProp: function(key, value) {
+            this.properties[key.toUpperCase()] = (typeof value != "unknown") ? value : '[Unknown]';
+        },
+
         generateString: function() {
             var res = '';
             for (var prop in this.properties) {
@@ -128,8 +132,9 @@ var TJAWriter = function() {
         },
 
         addTestData: function() {
-            this.properties['PROP1'] = 'value';
-            this.properties['PROP2'] = 765765;
+            this.properties['PROP2'] = 'first';
+            this.properties['PROP1'] = 765765;
+            this.properties['PROP3'] = 'value';
 
             var segment = new TJASegment(16);
             segment.notes = "1020112010201";
@@ -156,8 +161,9 @@ var TJAWriter = function() {
 
             /*
             Expected Output:
-            PROP1:value
-            PROP2:765765
+            PROP2:first
+            PROP1:765765
+            PROP3:value
 
             #START
             10201120
