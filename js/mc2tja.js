@@ -101,24 +101,24 @@ var mc2tja = function() {
             
             // First: fill out all necessary properties 
 
-            tja.addProp("TITLE", mc.meta.song.title);
-            tja.addProp("SUBTITLE", mc.meta.song.artist);
+            tja.prop("TITLE", mc.meta.song.title);
+            tja.prop("SUBTITLE", mc.meta.song.artist);
             if (!this.standardTja) {
-                tja.addProp("ARTIST", mc.meta.song.artist);
-                tja.addProp("AUTHOR", mc.meta.creator);
-                tja.addProp("COVER", mc.meta.background);
+                tja.prop("ARTIST", mc.meta.song.artist);
+                tja.prop("AUTHOR", mc.meta.creator);
+                tja.prop("COVER", mc.meta.background);
             }
 
             if (mc.mainSample) {
-                tja.addProp("WAVE", mc.mainSample.sound);
-                tja.addProp("OFFSET", (-0.001 * mc.mainSample.offset).toFixed(3));
-                tja.addProp("DEMOSTART", mc.meta.preview ? mc.meta.preview : mc.mainSample.offset);
+                tja.prop("WAVE", mc.mainSample.sound);
+                tja.prop("OFFSET", (-0.001 * mc.mainSample.offset).toFixed(3));
+                tja.prop("DEMOSTART", mc.meta.preview ? mc.meta.preview : mc.mainSample.offset);
             }
             if (mc.initTime) {
-                tja.addProp("BPM", mc.initTime.bpm);
+                tja.prop("BPM", mc.initTime.bpm);
             }
-            tja.addProp("SONGVOL", 100);
-            tja.addProp("SEVOL", 100);
+            tja.prop("SONGVOL", 100);
+            tja.prop("SEVOL", 100);
 
             var course = this.getCourseFromName(mc.meta.version);
             var level = this.getLevelFromName(mc.meta.version);
@@ -126,14 +126,14 @@ var mc2tja = function() {
                 course = this.getCourseFromLevel(level);
             var star = this.getStarFromCourseLevel(course, level);
 
-            tja.addProp("COURSE", course);
-            tja.addProp("LEVEL", star);
-            tja.addProp("SCOREMODE", 2);
-            tja.addProp("SCOREINIT", "");
-            tja.addProp("SCOREDIFF", "");
+            tja.prop("COURSE", course);
+            tja.prop("LEVEL", star);
+            tja.prop("SCOREMODE", 2);
+            tja.prop("SCOREINIT", "");
+            tja.prop("SCOREDIFF", "");
             
             // TODO: get something into BALLOON after grouping notes
-            //tja.addProp("BALLOON", "");
+            //tja.prop("BALLOON", "");
 
             // Second: group notes in segments
             // Third: add events according to time points, scaling segments if necessary
@@ -146,14 +146,20 @@ var mc2tja = function() {
             // -- 4. Join beat fractions together, and calculate the indices. Repeat from 3.
             // -- 5. Cheers!
 
+            // beginning bar property in mc meta
             var barBegin = mc.meta.mode_ext.bar_begin;
+            // the beat of current bar
             var barBeat = barBegin;
+            // next signature index after the beat of current bar
+            var nextSign = 0;
             
+            // get all notes
             var notes = mc.note.slice(0);
             notes.sort(function(a, b) {
                 return a.beat.compare(b.beat) < 0;
             });
 
+            // get all signatures
             var signs = [];
             for (var i in mc.effect) {
                 if (mc.effect[i].signature)
@@ -162,6 +168,11 @@ var mc2tja = function() {
             signs.sort(function(a, b) {
                 return a.beat.compare(b.beat) < 0;
             });
+
+            // some frequently used functions
+            var incBar = function() {
+
+            }
 
             // ...
 

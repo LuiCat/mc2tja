@@ -27,7 +27,7 @@ var MCReader = function() {
 	}
 	
 	var BeatTimeProto = {
-		value: function() {
+		valueOf: function() {
 			return this[0] + this[1] / (this[2] > 0 ? this[2] : 1);
 		},
 		compare: function(other) {
