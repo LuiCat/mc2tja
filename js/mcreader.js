@@ -12,6 +12,7 @@ var MCReader = function() {
 
 (function() {
 
+	/*
 	function compareInt(a, b) {
 		return a == b ? 0 : a < b ? -1 : 1;
 	}
@@ -25,7 +26,7 @@ var MCReader = function() {
 		}
 		return b;
 	}
-	
+
 	var BeatTimeProto = {
 		valueOf: function() {
 			return this[0] + this[1] / (this[2] > 0 ? this[2] : 1);
@@ -37,6 +38,7 @@ var MCReader = function() {
 			return compareInt((this[0] * den1 + this[1]) * mul1, (other[0] * den2 + other[1]) * mul2)
 		}
 	}
+	*/
  
  	MCReader.prototype = {
 		constructor: MCReader,
@@ -52,9 +54,11 @@ var MCReader = function() {
 
 			for (var i = 0; i < this.note.length; ++i) {
 				var note = this.note[i];
-				Object.setPrototypeOf(note.beat, BeatTimeProto);
+				note.beat = new Fraction(note.beat);
+				//Object.setPrototypeOf(note.beat, BeatTimeProto);
 				if (note.endbeat != null)
-					Object.setPrototypeOf(note.endbeat, BeatTimeProto);
+					note.endbeat = new Fraction(note.endbeat);
+					//Object.setPrototypeOf(note.endbeat, BeatTimeProto);
 				if (note.type == 1)	{
 					if (this.mainSample == null)
 						this.mainSample = note;
@@ -65,7 +69,8 @@ var MCReader = function() {
 
 			for (var i in this.time) {
 				var tp = this.time[i];
-				Object.setPrototypeOf(tp.beat, BeatTimeProto);
+				tp.beat = new Fraction(tp.beat);
+				//Object.setPrototypeOf(tp.beat, BeatTimeProto);
 				if (this.initTime == null || this.initTime.beat.compare(tp.beat) > 0)
 					this.initTime = tp;
 			}

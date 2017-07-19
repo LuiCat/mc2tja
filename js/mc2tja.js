@@ -151,8 +151,9 @@ var mc2tja = function() {
             // the beat of current bar
             var barBeat = barBegin;
             // next signature index after the beat of current bar
-            var nextSign = 0;
-            
+            var nextSignIndex = 0;
+            var sign = 4;
+
             // get all notes
             var notes = mc.note.slice(0);
             notes.sort(function(a, b) {
@@ -165,6 +166,8 @@ var mc2tja = function() {
                 if (mc.effect[i].signature)
                     signs.push({signature: mc.effect[i].signature, beat: mc.effect[i].beat});
             }
+            if (signs.length == 0) // just mix the default value in default logic
+                signs.push({signature: 4, beat: new Fraction([0, 0, 1])});
             signs.sort(function(a, b) {
                 return a.beat.compare(b.beat) < 0;
             });
