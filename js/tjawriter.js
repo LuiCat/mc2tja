@@ -110,7 +110,7 @@ var TJAWriter = function() {
 
         constructor: TJAWriter,
 
-        addProp: function(key, value) {
+        prop: function(key, value) {
             this.properties[key.toUpperCase()] = (typeof value != "unknown") ? value : '[Unknown]';
         },
 
