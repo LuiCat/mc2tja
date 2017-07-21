@@ -172,9 +172,63 @@ var mc2tja = function() {
                 return a.beat.compare(b.beat) < 0;
             });
 
-            // some frequently used functions
-            var incBar = function() {
+            // function to find signature index on the beat, based on binary search
+            var findSignIndex = function(beat) {
+                var i = 0, j = signs.length - 1, mid;
+                while (i < j) {
+                    mid = parseInt((i + j) / 2); // make a integer division
+                    if (signs[mid].beat.compare(beat) <= 0) // left half, should be not greater than parameter
+                        j = mid;
+                    else // right half, should be greater than parameter
+                        i = mid + 1;
+                }
+                return i;
+            }
 
+            // function to move beat forward by bars, or backward if a minus deltaBar value is given
+            // TODO: test this code!!!
+            var moveBeat = function(beat, deltaBar) {
+                var currSignIndex = findSignIndex(beat);
+                var currBeat = beat;
+                deltaBar = Math.round(deltaBar);
+                if (deltaBar > 0) { // go forward
+                    deltaBar = new Fraction([deltaBar, 0, 1]);
+                    while (true) {
+                        var nextSignBeat = currSignIndex + 1 < signs.length ? signs[currSignIndex + 1].beat : Fraction.Infinity;
+                        var sign = Math.round(signs[currSignIndex].signature);
+                        var nextBeat = currBeat.add(deltaBar.time(sign));
+                        if (nextBeat.compare(nextSignBeat) <= 0) {
+                            currBeat = nextBeat;
+                            break;
+                        }
+                        deltaBar.dec(nextSignBeat.cutoff(currBeat).divide(sign));
+                        currBeat = nextSignBeat;
+                        currSignIndex++;
+                    }
+                    return currBeat;
+                } else if (deltaBar < 0) { // go backward
+                    deltaBar = new Fraction([-deltaBar, 0, 1]);
+                    while (true) {
+                        var prevSignBeat = currSignIndex - 1 < 0 ? signs[currSignIndex - 1].beat : Fraction.MinusInfinity;
+                        var sign = Math.round(signs[currSignIndex].signature);
+                        var nextBeat = currBeat.cutoff(deltaBar.time(sign));
+                        if (nextBeat.compare(prevSignBeat) >= 0) {
+                            currBeat = nextBeat;
+                            break;
+                        }
+                        deltaBar.dec(currBeat.cutoff(prevSignBeat).divide(sign));
+                        currBeat = prevSignBeat;
+                        currSignIndex--;
+                    }
+                    return currBeat;
+                }
+            }
+
+            // the beat of beginning note
+            var firstBeat = notes.length == 0 ? barBeat : notes[0].beat;
+            // find the beginning bar
+            while (barBeat > firstBeat) {
+                barBeat = moveBeat(barBeat, -1);
             }
 
             // ...
