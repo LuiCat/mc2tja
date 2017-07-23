@@ -149,7 +149,7 @@ var mc2tja = function() {
             // beginning bar property in mc meta
             var barBegin = mc.meta.mode_ext.bar_begin;
             // the beat of current bar
-            var barBeat = barBegin;
+            var barBeat = new Fraction(barBegin);
             // next signature index after the beat of current bar
             var nextSignIndex = 0;
             var sign = 4;
@@ -157,7 +157,7 @@ var mc2tja = function() {
             // get all notes
             var notes = mc.note.slice(0);
             notes.sort(function(a, b) {
-                return a.beat.compare(b.beat) < 0;
+                return a.beat.compare(b.beat);
             });
 
             // get all signatures
@@ -167,20 +167,20 @@ var mc2tja = function() {
                     signs.push({signature: mc.effect[i].signature, beat: mc.effect[i].beat});
             }
             if (signs.length == 0) // just mix the default value in default logic
-                signs.push({signature: 4, beat: new Fraction([0, 0, 1])});
+                signs.push({signature: 4, beat: new Fraction(0)});
             signs.sort(function(a, b) {
-                return a.beat.compare(b.beat) < 0;
+                return a.beat.compare(b.beat);
             });
 
             // function to find signature index on the beat, based on binary search
             var findSignIndex = function(beat) {
                 var i = 0, j = signs.length - 1, mid;
                 while (i < j) {
-                    mid = parseInt((i + j) / 2); // make a integer division
-                    if (signs[mid].beat.compare(beat) <= 0) // left half, should be not greater than parameter
-                        j = mid;
-                    else // right half, should be greater than parameter
-                        i = mid + 1;
+                    mid = parseInt((i + j + 1) / 2); // make a integer division
+                    if (signs[mid].beat.compare(beat) > 0) // left half, should be not greater than parameter
+                        j = mid - 1;
+                    else // right half
+                        i = mid;
                 }
                 return i;
             }
@@ -192,7 +192,7 @@ var mc2tja = function() {
                 var currBeat = beat;
                 deltaBar = Math.round(deltaBar);
                 if (deltaBar > 0) { // go forward
-                    deltaBar = new Fraction([deltaBar, 0, 1]);
+                    deltaBar = new Fraction(deltaBar);
                     while (true) {
                         var nextSignBeat = currSignIndex + 1 < signs.length ? signs[currSignIndex + 1].beat : Fraction.Infinity;
                         var sign = Math.round(signs[currSignIndex].signature);
@@ -207,9 +207,9 @@ var mc2tja = function() {
                     }
                     return currBeat;
                 } else if (deltaBar < 0) { // go backward
-                    deltaBar = new Fraction([-deltaBar, 0, 1]);
+                    deltaBar = new Fraction(-deltaBar); // absolute value
                     while (true) {
-                        var prevSignBeat = currSignIndex - 1 < 0 ? signs[currSignIndex - 1].beat : Fraction.MinusInfinity;
+                        var prevSignBeat = currSignIndex > 0 ? signs[currSignIndex].beat : Fraction.MinusInfinity;
                         var sign = Math.round(signs[currSignIndex].signature);
                         var nextBeat = currBeat.cutoff(deltaBar.time(sign));
                         if (nextBeat.compare(prevSignBeat) >= 0) {
@@ -227,7 +227,7 @@ var mc2tja = function() {
             // the beat of beginning note
             var firstBeat = notes.length == 0 ? barBeat : notes[0].beat;
             // find the beginning bar
-            while (barBeat > firstBeat) {
+            while (barBeat.compare(firstBeat) > 0) {
                 barBeat = moveBeat(barBeat, -1);
             }
 
@@ -238,6 +238,7 @@ var mc2tja = function() {
             this.generated = tja.generateString();
 
             return true;
+        
         }
     }
 

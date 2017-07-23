@@ -116,7 +116,7 @@ function Fraction(initVal) {
 
 	}
 	
-	Fraction.Infinity = Fraction([Infinity, 0, 1]);
-	Fraction.MinusInfinity = Fraction([-Infinity, 0, 1]);
+	Fraction.Infinity = new Fraction([Infinity, 0, 1]);
+	Fraction.MinusInfinity = new Fraction([-Infinity, 0, 1]);
     
 })();

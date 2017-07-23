@@ -75,6 +75,12 @@ var MCReader = function() {
 					this.initTime = tp;
 			}
 
+			for (var i in this.effect) {
+				var eff = this.effect[i];
+				eff.beat = new Fraction(eff.beat);
+				//Object.setPrototypeOf(tp.beat, BeatTimeProto);
+			}
+
 		},
 
 		read: function(url, onload) {
