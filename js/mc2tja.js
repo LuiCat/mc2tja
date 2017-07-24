@@ -1,15 +1,21 @@
-function requireScript(type, url)
+function requireScript(load, url)
 {
-    if (type) return;
-    var head = document.getElementsByTagName('head')[0];
-    var script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.src = url;
-    head.appendChild(script);
+    if (!load) return;
+    if (typeof require == "undefined") {
+        var head = document.getElementsByTagName('head')[0];
+        var script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = 'js/' + url;
+        head.appendChild(script);
+        alert('1');
+    } else {
+        require(url);
+    }
 }
 
-requireScript(MCReader, 'mcreader.js');
-requireScript(TJAWriter, 'tjawriter.js');
+requireScript(typeof Fraction == "undefined", 'fraction.js');
+requireScript(typeof MCReader == "undefined", 'mcreader.js');
+requireScript(typeof TJAWriter == "undefined", 'tjawriter.js');
 
 var mc2tja = function() {
     this.generated = null; // the generated result text of tja
@@ -131,9 +137,6 @@ var mc2tja = function() {
             tja.prop("SCOREMODE", 2);
             tja.prop("SCOREINIT", "");
             tja.prop("SCOREDIFF", "");
-            
-            // TODO: get something into BALLOON after grouping notes
-            //tja.prop("BALLOON", "");
 
             // Second: group notes in segments
             // Third: add events according to time points, scaling segments if necessary
@@ -186,7 +189,6 @@ var mc2tja = function() {
             }
 
             // function to move beat forward by bars, or backward if a minus deltaBar value is given
-            // TODO: test this code!!!
             var moveBeat = function(beat, deltaBar) {
                 var currSignIndex = findSignIndex(beat);
                 var currBeat = beat;
@@ -231,7 +233,17 @@ var mc2tja = function() {
                 barBeat = moveBeat(barBeat, -1);
             }
 
+            // ---- HOW TO CREATE A TJA SEGMENT FROM MC
+            // ---- 1. Get the beat on the beginning of next bar, and measure the beat length of current bar;
+            // ---- 2. If the beat length changed, add a #MEASURE event directly at the beginning (position 0);
+            // ---- 3. Add all notes during this bar to a list, divide the beat values by bar length and temporary stores endbeat of one long note if appliable;
+            // ---- 4. Unify demonitator of the beat values using gcd and fill the notes to the segment according to the numerators.
+
             // ...
+
+            // don't forget the balloons!
+            // TODO: get something into BALLOON after grouping notes
+            //tja.prop("BALLOON", "");
 
             // Finally: just generate!
 
