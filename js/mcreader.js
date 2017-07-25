@@ -104,6 +104,6 @@ var MCReader = function() {
 			f.readAsText(url);
 		}
 
-	}
+	};
 
 })();

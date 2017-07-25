@@ -86,6 +86,7 @@ var mc2tja = function() {
         },
 
         getNumFromNoteStyle: function(style) {
+            style += 1;
             if (style == 2 || style == 3)
                 style = 5 - style;
             return style.toString();
@@ -123,6 +124,7 @@ var mc2tja = function() {
 
             if (mc.mainSample) {
                 tja.prop('WAVE', mc.mainSample.sound);
+                // TODO: calculate the real offset
                 tja.prop('OFFSET', (-0.001 * mc.mainSample.offset).toFixed(3));
                 tja.prop('DEMOSTART', mc.meta.preview ? mc.meta.preview : mc.mainSample.offset);
             }
@@ -247,9 +249,9 @@ var mc2tja = function() {
 
             var noteIndex = 0;
             var bpmIndex = 0;
-            var lastBarLength = new Fraction(0);
+            var lastBarLength = new Fraction(4);
             var lastLongNote = null;
-            while (noteIndex < notes.length && lastLongNote) {
+            while (noteIndex < notes.length || lastLongNote) {
                 // HOW TO CREATE A TJA SEGMENT FROM MC
                 // 1. Get the beat on the beginning of next bar, and measure the beat length of current bar;
                 // 2. Add all notes during this bar to a list, divide the beat values by bar length and temporary stores previous unfinished long note;
@@ -288,18 +290,27 @@ var mc2tja = function() {
                 // add notes into the segment
                 var segment = new TJASegment(denom);
                 for (var i in segmentNotes) {
-                    segment.note[segmentNotes[i].beat.index(denom)] = segmentNotes[i].num;
+                    segment.notes[segmentNotes[i].beat.index(denom)] = segmentNotes[i].num;
                 }
 
                 // check measure changes
                 if (barLength.compare(lastBarLength) != 0) {
-                    segment.addEvent(new TJAEvent(0, 'MEASURE', barLength.beat.index() + '/' + barLength.beat[2]));
+                    var measure = barLength.divide(4);
+                    var times = (measure[2] == 1 ? 4 : measure[2] == 2 ? 2 : 1);
+                    segment.addEvent(new TJAEvent(0, 'MEASURE', (measure.index() * times) + '/' + (measure[2] * times)));
                 }
 
-                // TODO: add bpmchange events
+                // TODO: add #BPMCHANGE events
                 // TODO: add other tja events
 
+                tja.segments.push(segment);
+
+                barBeat = nextBarBeat;
+                lastBarLength = barLength;
+
             }
+
+            // TODO: add #BARLINEOFF & #BARLINEON events according to barBegin
 
             // don't forget the balloons!
             // TODO: get something into BALLOON after grouping notes
@@ -312,7 +323,7 @@ var mc2tja = function() {
             return true;
         
         }
-    }
+    };
 
 })();
 

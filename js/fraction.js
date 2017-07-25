@@ -19,7 +19,7 @@ function Fraction(initVal) {
 
 	function compareInt(a, b) {
 		return a == b ? 0 : a < b ? -1 : 1;
-	}
+	};
 
 	function gcd(a, b) {
 		var t;
@@ -29,7 +29,7 @@ function Fraction(initVal) {
 			a = t;
 		}
 		return b;
-	}
+	};
 	
 	Fraction.gcd = gcd;
     
@@ -135,7 +135,7 @@ function Fraction(initVal) {
 			return result.dec(beat);
 		}
 
-	}
+	};
 	
 	Fraction.Infinity = new Fraction([Infinity, 0, 1]);
 	Fraction.MinusInfinity = new Fraction([-Infinity, 0, 1]);
