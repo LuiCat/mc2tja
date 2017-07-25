@@ -92,7 +92,7 @@ var mc2tja = function() {
             return style.toString();
         },
 
-        convert: function(mc) {
+        convert: function(mc, onsuccess) {
             if (typeof mc == 'string') { // mc text content
                 var text = mc;
                 mc = new MCReader();
@@ -110,7 +110,7 @@ var mc2tja = function() {
                 return false;
             }
 
-            // TODO: syntax check
+            // TODO: mc syntax check
             
             // First: fill out all necessary properties 
 
@@ -266,16 +266,18 @@ var mc2tja = function() {
                 // get note into lists and at the same time convert note styles
                 for (; noteIndex < notes.length && notes[noteIndex].beat.compare(nextBarBeat) < 0; ++noteIndex) {
                     if (lastLongNote) {
-                        if (notes[noteIndex].beat.compare(lastLongNote.beat) <= 0) {
+                        if (notes[noteIndex].beat.compare(lastLongNote) <= 0) {
                             continue;
                         }
-                        segmentNotes.push({beat: lastLongNote.endbeat.cutoff(barBeat), num:'8'});
+                        segmentNotes.push({beat: lastLongNote.cutoff(barBeat), num:'8'});
                         lastLongNote = null;
                     }
                     segmentNotes.push({beat: notes[noteIndex].beat.cutoff(barBeat), num:this.getNumFromNoteStyle(notes[noteIndex].style)});
+                    if (notes[noteIndex].endbeat)
+                        lastLongNote = notes[noteIndex].endbeat;
                 }
-                if (lastLongNote && lastLongNote.beat.compare(nextBarBeat) < 0) {
-                    segmentNotes.push({beat: lastLongNote.endbeat.cutoff(barBeat), num:'8'});
+                if (lastLongNote && lastLongNote.compare(nextBarBeat) < 0) {
+                    segmentNotes.push({beat: lastLongNote.cutoff(barBeat), num:'8'});
                     lastLongNote = null;
                 }
                 
@@ -319,6 +321,8 @@ var mc2tja = function() {
             // Finally: just generate!
 
             this.generated = tja.generateString();
+
+            onsuccess();
 
             return true;
         

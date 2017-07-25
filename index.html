@@ -52,7 +52,7 @@ html, body {
 	<input type="button" name="load" class="btn" value="Load" onclick="onUrl()" />
 	<span>or select local file:</span>
 	<input type="file" name="fileField" class="file" id="form-file" accept=".mc" onchange="onFile()" size="28" />
-	<input type="button" name="convert" class="btn" value="Convert!" />
+	<input type="button" name="convert" class="btn" id="btn-convert" value="Convert!" onclick="onConvert()"  disabled />
 	<input type="button" name="save" class="btn" id="btn-save" hidden value="Save" />
 </form>
 
@@ -82,8 +82,7 @@ html, body {
 var mc = new MCReader();
 var conv = new mc2tja();
 
-function onFile()
-{
+function onFile() {
 	var url = $('#form-file').prop('files')[0];
 	if (!url) {
 		$('#origin-text').html('');
@@ -94,18 +93,23 @@ function onFile()
 	}
 }
 
-function onUrl()
-{
+function onUrl() {
 	var url = $('#form-url').prop('value');
 	if (!url) {
 		$('#origin-text').html('');
 	} else {
 		mc.read(url, function() {
 			$('#origin-text').html(mc.text);
-			conv.convert(mc);
-			$('#converted-text').html(conv.generated);
+			// TODO: mc syntax check
+			$('#btn-convert').removeAttr("disabled");
 		});
 	}
+}
+
+function onConvert() {
+	conv.convert(mc, function() {
+		$('#converted-text').html(conv.generated);
+	});
 }
 
 </script>
