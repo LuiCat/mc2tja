@@ -52,8 +52,7 @@ html, body {
 	<input type="button" name="load" class="btn" value="Load" onclick="onUrl()" />
 	<span>or select local file:</span>
 	<input type="file" name="fileField" class="file" id="form-file" accept=".mc" onchange="onFile()" size="28" />
-	<input type="button" name="convert" class="btn" id="btn-convert" value="Convert!" onclick="onConvert()"  disabled />
-	<input type="button" name="save" class="btn" id="btn-save" hidden value="Save" />
+	<input type="button" name="convert" class="btn" id="btn-convert" value="Convert!" onclick="onConvert()" disabled />
 </form>
 
 <div class="details">
@@ -67,6 +66,7 @@ html, body {
 	</div>
 	<div class="converted">
 		<span>Converted (TJA Chart)</span>
+		<span><a id="btn-save" hidden>Save this file</a></span>
 		<div class="scroll bordered">
 			<pre class="converted-text code" id="converted-text"></pre>
 		</div>
@@ -89,6 +89,7 @@ function onFile() {
 	} else {
 		mc.readLocal(url, function() {
 			$('#origin-text').html(mc.text);
+			$('#btn-convert').removeAttr('disabled');
 		});
 	}
 }
@@ -101,7 +102,7 @@ function onUrl() {
 		mc.read(url, function() {
 			$('#origin-text').html(mc.text);
 			// TODO: mc syntax check
-			$('#btn-convert').removeAttr("disabled");
+			$('#btn-convert').removeAttr('disabled');
 		});
 	}
 }
@@ -109,6 +110,11 @@ function onUrl() {
 function onConvert() {
 	conv.convert(mc, function() {
 		$('#converted-text').html(conv.generated);
+		var url = 'data:text/plain;charset=gbk,' + encodeURIComponent(conv.generated);
+		var filename = mc.filename.replace(/.mc$/i, '.tja');
+		$('#btn-save').attr('download', filename);               
+		$('#btn-save').attr('href', url);
+		$('#btn-save').removeAttr('hidden');
 	});
 }
 

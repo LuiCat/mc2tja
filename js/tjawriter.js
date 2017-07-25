@@ -60,7 +60,7 @@ var TJASegment = function(initSize) {
                 while (event && event.index <= index) {
                     if (!(event.keepLine || (eventAtBegin && index == 0))) {
                         eventAtBegin = false;
-                        res += '\n';
+                        res += '\r\n';
                     }
                     res += event;
                     ++i_event;
@@ -68,7 +68,7 @@ var TJASegment = function(initSize) {
                     needBreakLine = true;
                 }
                 if (needBreakLine) {
-                    res += '\n';
+                    res += '\r\n';
                     needBreakLine = false;
                 }
                 res += note;
@@ -79,7 +79,7 @@ var TJASegment = function(initSize) {
             for (i_event in this.endEvents) {
                 event = this.endEvents[i_event];
                 if (!event.keepLine)
-                    res += '\n';
+                    res += '\r\n';
                 res += event;
                 needBreakLine = true;
             }
@@ -118,16 +118,16 @@ var TJASegment = function(initSize) {
             var res = '';
             for (var prop in this.properties) {
                 var value = this.properties[prop];
-                res += prop + ':' + value + '\n';
+                res += prop + ':' + value + '\r\n';
             }
-            res += '\n';
-            res += this.startEvent + '\n';
+            res += '\r\n';
+            res += this.startEvent + '\r\n';
             for (var i_seg in this.segments) {
                 var segment = this.segments[i_seg];
-                res += segment + '\n';
+                res += segment + '\r\n';
             }
-            res += this.endEvent + '\n';
-            res += '\n';
+            res += this.endEvent + '\r\n';
+            res += '\r\n';
             return res;
         },
 

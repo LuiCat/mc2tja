@@ -1,4 +1,5 @@
 var MCReader = function() {
+	this.filename = '';
 	this.text = null;
 	this.content = {};
 	this.meta = null;
@@ -83,8 +84,19 @@ var MCReader = function() {
 
 		},
 
+		parseFilename: function(url) {
+			if (url instanceof File) {
+				this.filename = url.name;
+				return;
+			}
+			var res = url.match(/(?:.*\/)*([^\/]*\.mc)/i);
+			if (res)
+				this.filename = res[1];
+		},
+
 		read: function(url, onload) {
 			var self = this;
+			this.parseFilename(url);
 			$.ajax({
 				url : url,
 				success : function(result) {
@@ -97,6 +109,7 @@ var MCReader = function() {
 		readLocal: function(url, onload) {
 			var f = new FileReader();
 			var self = this;
+			this.parseFilename(url);
 			f.onload = function() {
 				self.parse(f.result);
 				onload.apply(self);

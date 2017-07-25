@@ -115,7 +115,7 @@ var mc2tja = function() {
             // First: fill out all necessary properties 
 
             tja.prop('TITLE', mc.meta.song.title);
-            tja.prop('SUBTITLE', mc.meta.song.artist);
+            tja.prop('SUBTITLE', '--'+mc.meta.song.artist);
             if (!this.standardTja) {
                 tja.prop('ARTIST', mc.meta.song.artist);
                 tja.prop('AUTHOR', mc.meta.creator);
@@ -126,6 +126,7 @@ var mc2tja = function() {
                 tja.prop('WAVE', mc.mainSample.sound);
                 // TODO: calculate the real offset
                 tja.prop('OFFSET', (-0.001 * mc.mainSample.offset).toFixed(3));
+                // TODO: fix preview time
                 tja.prop('DEMOSTART', mc.meta.preview ? mc.meta.preview : mc.mainSample.offset);
             }
             if (mc.initTime) {
