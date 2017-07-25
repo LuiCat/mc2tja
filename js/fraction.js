@@ -9,7 +9,7 @@ function Fraction(initVal) {
 		this[2] = initVal[2];
 		this.reduct();
 	} else {
-		this[0] = (typeof initVal == "number" ? parseInt(initVal) : 0);
+		this[0] = (typeof initVal == 'number' ? parseInt(initVal) : 0);
 		this[1] = 0;
 		this[2] = 1;
 	}
@@ -29,7 +29,9 @@ function Fraction(initVal) {
 			a = t;
 		}
 		return b;
-    }
+	}
+	
+	Fraction.gcd = gcd;
     
     Fraction.prototype = {
 		// override default behavior in converting a fraction to a number
@@ -39,7 +41,7 @@ function Fraction(initVal) {
 		
 		// compares a fraction to another fraction or number. return -1, 0, 1 in different cases, lesser, equal or greater
 		compare: function(other) {
-			if (typeof other == "number") {
+			if (typeof other == 'number') {
 				var val = this.valueOf();
 				return val == other ? 0 : val < other ? -1 : 1;
 			}
@@ -71,14 +73,33 @@ function Fraction(initVal) {
 			return new Fraction([0, num, den]);
 		},
 
+		// returns multiple divides of the fraction
 		divide: function(times) {
 			var den = this[2], num = this[0] * den + this[1];
 			return new Fraction([0, num, den * times]);
 		},
 
+		// scale the fraction down from [0, range] to [0, 1]
+		normalize: function(range) {
+			var den1 = this[2], num1 = this[0] * den1 + this[1];
+			var den2 = range[2], num2 = range[0] * den2 + range[1];
+			this[0] = 0;
+			this[1] = num1 * den2;
+			this[2] = den1 * num2;
+			this.reduct();
+			return this;
+		},
+
+		// apply the fraction to [0, range) and return an integer index in range
+		index: function(range) {
+			if (range)
+				return parseInt((this[0] + this[1] / this[2]) * range);
+			return this[0] * this[2] + this[1];
+		},
+
 		// increases the fraction
 		inc: function(beat) {
-			if (typeof beat == "number") {
+			if (typeof beat == 'number') {
 				this[0] += Math.round(beat);
 				return this;
 			}
@@ -91,7 +112,7 @@ function Fraction(initVal) {
 
 		// decreases the fraction
 		dec: function(beat) {
-			if (typeof beat == "number") {
+			if (typeof beat == 'number') {
 				this[0] -= Math.round(beat);
 				return this;
 			}

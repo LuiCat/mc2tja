@@ -1,7 +1,7 @@
 function requireScript(load, url)
 {
     if (!load) return;
-    if (typeof require == "undefined") {
+    if (typeof require == 'undefined') {
         var head = document.getElementsByTagName('head')[0];
         var script = document.createElement('script');
         script.type = 'text/javascript';
@@ -13,9 +13,9 @@ function requireScript(load, url)
     }
 }
 
-requireScript(typeof Fraction == "undefined", 'fraction.js');
-requireScript(typeof MCReader == "undefined", 'mcreader.js');
-requireScript(typeof TJAWriter == "undefined", 'tjawriter.js');
+requireScript(typeof Fraction == 'undefined', 'fraction.js');
+requireScript(typeof MCReader == 'undefined', 'mcreader.js');
+requireScript(typeof TJAWriter == 'undefined', 'tjawriter.js');
 
 var mc2tja = function() {
     this.generated = null; // the generated result text of tja
@@ -32,10 +32,10 @@ var mc2tja = function() {
     this.harderLevelTable = // stars below 10-star (tentatively formed by xipigu), starting from lv.28
         [1,1,2,2,3,3,4,4,4,5,5,5,6,6,6,7,7,7,8,8,8,9,9];
     this.courseStrings = [
-        ["kantan", "easy"],
-        ["futsuu", "normal", "futsu"],
-        ["muzukashii", "hard", "muzu"],
-        ["oni", "ura", "inner", "+"]
+        ['kantan', 'easy'],
+        ['futsuu', 'normal', 'futsu'],
+        ['muzukashii', 'hard', 'muzu'],
+        ['oni', 'ura', 'inner', '+']
     ]
 };
 
@@ -44,7 +44,7 @@ var mc2tja = function() {
         constructor: mc2tja,
 
         // Find all possible names in version text to know what course the chart could possible be in.
-        // Return an integer represents the course, being used in "COURSE:" property in tja.
+        // Return an integer represents the course, being used in 'COURSE:' property in tja.
         getCourseFromName: function(text) {
             var t = text.toLowerCase();
             for (var course = 3; course >= 0; --course)
@@ -55,7 +55,7 @@ var mc2tja = function() {
         },
 
         // Find a possible course the level fits, from Kantan firstly to Muzukashii, every last situation going to Oni.
-        // Return an integer represents the course, being used in "COURSE:" property in tja.
+        // Return an integer represents the course, being used in 'COURSE:' property in tja.
         getCourseFromLevel: function(level) {
             if (level < 0) // nice try hehe
                 return this.defaultCourse;
@@ -85,21 +85,27 @@ var mc2tja = function() {
             return star < 1 ? 1 : star;
         },
 
+        getNumFromNoteStyle: function(style) {
+            if (style == 2 || style == 3)
+                style = 5 - style;
+            return style.toString();
+        },
+
         convert: function(mc) {
-            if (typeof mc == "string") { // mc text content
+            if (typeof mc == 'string') { // mc text content
                 var text = mc;
                 mc = new MCReader();
                 mc.parse(text);
             } else if (!(mc instanceof MCReader)) { // no MCReader, no accepts
-                throw TypeError("Parameter not supported by mc2tja.convert");
+                throw TypeError('Parameter not supported by mc2tja.convert');
             } else if (mc.text == null) {
-                throw Error("Not chart parsed by parameter MCReader");
+                throw Error('Not chart parsed by parameter MCReader');
             }
 
             var tja = new TJAWriter();
 
             if(mc.meta.mode != 5) {
-                console.error("Non-taiko MC chart detected. the convertion has failed.")
+                console.error('Non-taiko MC chart detected. the convertion has failed.')
                 return false;
             }
 
@@ -107,24 +113,24 @@ var mc2tja = function() {
             
             // First: fill out all necessary properties 
 
-            tja.prop("TITLE", mc.meta.song.title);
-            tja.prop("SUBTITLE", mc.meta.song.artist);
+            tja.prop('TITLE', mc.meta.song.title);
+            tja.prop('SUBTITLE', mc.meta.song.artist);
             if (!this.standardTja) {
-                tja.prop("ARTIST", mc.meta.song.artist);
-                tja.prop("AUTHOR", mc.meta.creator);
-                tja.prop("COVER", mc.meta.background);
+                tja.prop('ARTIST', mc.meta.song.artist);
+                tja.prop('AUTHOR', mc.meta.creator);
+                tja.prop('COVER', mc.meta.background);
             }
 
             if (mc.mainSample) {
-                tja.prop("WAVE", mc.mainSample.sound);
-                tja.prop("OFFSET", (-0.001 * mc.mainSample.offset).toFixed(3));
-                tja.prop("DEMOSTART", mc.meta.preview ? mc.meta.preview : mc.mainSample.offset);
+                tja.prop('WAVE', mc.mainSample.sound);
+                tja.prop('OFFSET', (-0.001 * mc.mainSample.offset).toFixed(3));
+                tja.prop('DEMOSTART', mc.meta.preview ? mc.meta.preview : mc.mainSample.offset);
             }
             if (mc.initTime) {
-                tja.prop("BPM", mc.initTime.bpm);
+                tja.prop('BPM', mc.initTime.bpm);
             }
-            tja.prop("SONGVOL", 100);
-            tja.prop("SEVOL", 100);
+            tja.prop('SONGVOL', 100);
+            tja.prop('SEVOL', 100);
 
             var course = this.getCourseFromName(mc.meta.version);
             var level = this.getLevelFromName(mc.meta.version);
@@ -132,11 +138,11 @@ var mc2tja = function() {
                 course = this.getCourseFromLevel(level);
             var star = this.getStarFromCourseLevel(course, level);
 
-            tja.prop("COURSE", course);
-            tja.prop("LEVEL", star);
-            tja.prop("SCOREMODE", 2);
-            tja.prop("SCOREINIT", "");
-            tja.prop("SCOREDIFF", "");
+            tja.prop('COURSE', course);
+            tja.prop('LEVEL', star);
+            tja.prop('SCOREMODE', 2);
+            tja.prop('SCOREINIT', '');
+            tja.prop('SCOREDIFF', '');
 
             // Second: group notes in segments
             // Third: add events according to time points, scaling segments if necessary
@@ -172,6 +178,12 @@ var mc2tja = function() {
             if (signs.length == 0) // just mix the default value in default logic
                 signs.push({signature: 4, beat: new Fraction(0)});
             signs.sort(function(a, b) {
+                return a.beat.compare(b.beat);
+            });
+
+            // get all bpms
+            var bpms = mc.time.slice(0);
+            bpms.sort(function(a, b) {
                 return a.beat.compare(b.beat);
             });
 
@@ -233,17 +245,65 @@ var mc2tja = function() {
                 barBeat = moveBeat(barBeat, -1);
             }
 
-            // ---- HOW TO CREATE A TJA SEGMENT FROM MC
-            // ---- 1. Get the beat on the beginning of next bar, and measure the beat length of current bar;
-            // ---- 2. If the beat length changed, add a #MEASURE event directly at the beginning (position 0);
-            // ---- 3. Add all notes during this bar to a list, divide the beat values by bar length and temporary stores endbeat of one long note if appliable;
-            // ---- 4. Unify demonitator of the beat values using gcd and fill the notes to the segment according to the numerators.
+            var noteIndex = 0;
+            var bpmIndex = 0;
+            var lastBarLength = new Fraction(0);
+            var lastLongNote = null;
+            while (noteIndex < notes.length && lastLongNote) {
+                // HOW TO CREATE A TJA SEGMENT FROM MC
+                // 1. Get the beat on the beginning of next bar, and measure the beat length of current bar;
+                // 2. Add all notes during this bar to a list, divide the beat values by bar length and temporary stores previous unfinished long note;
+                // 3. Unify denomitator of the beat values using gcd and fill the notes to the segment according to the numerators;
+                // 4. If the beat length changed, add a #MEASURE event directly at the beginning (position 0).
+                
+                // get beat values
+                var nextBarBeat = moveBeat(barBeat, 1);
+                var barLength = nextBarBeat.cutoff(barBeat);
+                var segmentNotes = [];
 
-            // ...
+                // get note into lists and at the same time convert note styles
+                for (; noteIndex < notes.length && notes[noteIndex].beat.compare(nextBarBeat) < 0; ++noteIndex) {
+                    if (lastLongNote) {
+                        if (notes[noteIndex].beat.compare(lastLongNote.beat) <= 0) {
+                            continue;
+                        }
+                        segmentNotes.push({beat: lastLongNote.endbeat.cutoff(barBeat), num:'8'});
+                        lastLongNote = null;
+                    }
+                    segmentNotes.push({beat: notes[noteIndex].beat.cutoff(barBeat), num:this.getNumFromNoteStyle(notes[noteIndex].style)});
+                }
+                if (lastLongNote && lastLongNote.beat.compare(nextBarBeat) < 0) {
+                    segmentNotes.push({beat: lastLongNote.endbeat.cutoff(barBeat), num:'8'});
+                    lastLongNote = null;
+                }
+                
+                // divide beat values by bar length and calc unified denomitator
+                var denom = 1;
+                for (var i in segmentNotes) {
+                    segmentNotes[i].beat.normalize(barLength);
+                    denom *= segmentNotes[i].beat[2] / Fraction.gcd(segmentNotes[i].beat[2], denom);
+                }
+                // TODO: get bpm beats into calculation
+                
+                // add notes into the segment
+                var segment = new TJASegment(denom);
+                for (var i in segmentNotes) {
+                    segment.note[segmentNotes[i].beat.index(denom)] = segmentNotes[i].num;
+                }
+
+                // check measure changes
+                if (barLength.compare(lastBarLength) != 0) {
+                    segment.addEvent(new TJAEvent(0, 'MEASURE', barLength.beat.index() + '/' + barLength.beat[2]));
+                }
+
+                // TODO: add bpmchange events
+                // TODO: add other tja events
+
+            }
 
             // don't forget the balloons!
             // TODO: get something into BALLOON after grouping notes
-            //tja.prop("BALLOON", "");
+            //tja.prop('BALLOON', '');
 
             // Finally: just generate!
 
