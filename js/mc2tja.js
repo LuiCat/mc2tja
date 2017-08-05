@@ -29,8 +29,8 @@ var mc2tja = function() {
         [0,0,0,0,0,0,0,1,2,3,4,5,5,6,6,7,7,8], // Muzukashii / Hard
         [1,1,1,1,1,1,1,1,1,1,1,2,3,4,4,5,5,5,6,6,7,7,8,8,8,9,9,9,10] // Oni
     ];
-    this.harderLevelTable = // stars below 10-star (tentatively formed by xipigu), starting from lv.28
-        [1,1,2,2,3,3,4,4,4,5,5,5,6,6,6,7,7,7,8,8,8,9,9];
+    this.harderLevelTable = // stars below 10-star (according to xipigu), starting from lv.28
+        [1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9];
     this.courseStrings = [
         ['kantan', 'easy'],
         ['futsuu', 'normal', 'futsu'],
@@ -111,6 +111,35 @@ var mc2tja = function() {
             }
 
             // TODO: mc syntax check
+
+            // Zero: preparations
+            
+            // beginning bar property in mc meta
+            var barBegin = mc.meta.mode_ext.bar_begin;
+
+            // get all notes
+            var notes = mc.note.slice(0);
+            notes.sort(function(a, b) {
+                return a.beat.compare(b.beat);
+            });
+
+            // get all signatures
+            var signs = [];
+            for (var i in mc.effect) {
+                if (mc.effect[i].signature)
+                    signs.push({signature: mc.effect[i].signature, beat: mc.effect[i].beat});
+            }
+            if (signs.length == 0) // just mix the default value in default logic
+                signs.push({signature: 4, beat: new Fraction(0)});
+            signs.sort(function(a, b) {
+                return a.beat.compare(b.beat);
+            });
+
+            // get all bpms
+            var bpms = mc.time.slice(0);
+            bpms.sort(function(a, b) {
+                return a.beat.compare(b.beat);
+            });
             
             // First: fill out all necessary properties 
 
@@ -124,10 +153,23 @@ var mc2tja = function() {
 
             if (mc.mainSample) {
                 tja.prop('WAVE', mc.mainSample.sound);
-                // TODO: calculate the real offset
-                tja.prop('OFFSET', (-0.001 * mc.mainSample.offset).toFixed(3));
-                // TODO: fix preview time
-                tja.prop('DEMOSTART', mc.meta.preview ? mc.meta.preview : mc.mainSample.offset);
+                // calculate the real offset & preview offset
+                var offset = 0;
+                var lastBPM = mc.initTime.bpm;
+                var lastBeat = mc.mainSample.beat;
+                for (var i in bpms) {
+                    if (bpms[i].beat.compare(barBegin) >= 0) {
+                        break;
+                    }
+                    if (bpms[i].beat.compare(lastBeat) > 0) {
+                        offset += (bpms[i].beat - lastBeat) * 60 / lastBPM;
+                    }
+                    lastBPM = bpms[i].bpm;
+                    lastBeat = bpms[i].beat;
+                }
+                offset += (barBegin - lastBeat) * 60 / lastBPM - 0.001 * mc.mainSample.offset;
+                tja.prop('OFFSET', (-offset).toFixed(3));
+                tja.prop('DEMOSTART', (mc.meta.preview ? 0.001 * mc.meta.preview : offset).toFixed(3));
             }
             if (mc.initTime) {
                 tja.prop('BPM', mc.initTime.bpm);
@@ -158,37 +200,11 @@ var mc2tja = function() {
             // -- 4. Join beat fractions together, and calculate the indices. Repeat from 3.
             // -- 5. Cheers!
 
-            // beginning bar property in mc meta
-            var barBegin = mc.meta.mode_ext.bar_begin;
             // the beat of current bar
             var barBeat = new Fraction(barBegin);
             // next signature index after the beat of current bar
             var nextSignIndex = 0;
             var sign = 4;
-
-            // get all notes
-            var notes = mc.note.slice(0);
-            notes.sort(function(a, b) {
-                return a.beat.compare(b.beat);
-            });
-
-            // get all signatures
-            var signs = [];
-            for (var i in mc.effect) {
-                if (mc.effect[i].signature)
-                    signs.push({signature: mc.effect[i].signature, beat: mc.effect[i].beat});
-            }
-            if (signs.length == 0) // just mix the default value in default logic
-                signs.push({signature: 4, beat: new Fraction(0)});
-            signs.sort(function(a, b) {
-                return a.beat.compare(b.beat);
-            });
-
-            // get all bpms
-            var bpms = mc.time.slice(0);
-            bpms.sort(function(a, b) {
-                return a.beat.compare(b.beat);
-            });
 
             // function to find signature index on the beat, based on binary search
             var findSignIndex = function(beat) {
