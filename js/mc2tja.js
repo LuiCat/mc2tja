@@ -268,6 +268,7 @@ var mc2tja = function() {
             var bpmIndex = 0;
             var lastBarLength = new Fraction(4);
             var lastLongNote = null;
+            var balloons = [];
             while (noteIndex < notes.length || lastLongNote) {
                 // HOW TO CREATE A TJA SEGMENT FROM MC
                 // 1. Get the beat on the beginning of next bar, and measure the beat length of current bar;
@@ -292,6 +293,8 @@ var mc2tja = function() {
                     segmentNotes.push({beat: notes[noteIndex].beat.cutoff(barBeat), num:this.getNumFromNoteStyle(notes[noteIndex].style)});
                     if (notes[noteIndex].endbeat)
                         lastLongNote = notes[noteIndex].endbeat;
+                    if (notes[noteIndex].hits)
+                        balloons.push(notes[noteIndex].hits);
                 }
                 if (lastLongNote && lastLongNote.compare(nextBarBeat) < 0) {
                     segmentNotes.push({beat: lastLongNote.cutoff(barBeat), num:'8'});
@@ -332,8 +335,8 @@ var mc2tja = function() {
             // TODO: add #BARLINEOFF & #BARLINEON events according to barBegin
 
             // don't forget the balloons!
-            // TODO: get something into BALLOON after grouping notes
-            //tja.prop('BALLOON', '');
+            if (balloons.length > 0)
+                tja.prop('BALLOON', balloons.join(','));
 
             // Finally: just generate!
 
