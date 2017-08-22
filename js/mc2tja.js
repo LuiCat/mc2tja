@@ -24,18 +24,18 @@ var mc2tja = function() {
     this.defaultCourse = 3; // default value if no course info is concluded
     this.defaultStar = 10; // default value if no star info is concluded
     this.levelTable = [ // standard level table, matching level & course to stars
-        [0,1,2,3,4,5], // Kantan / Easy
-        [0,0,0,1,2,3,4,5,6,6,7], // Futsuu / Normal
-        [0,0,0,0,0,0,0,1,2,3,4,5,5,6,6,7,7,8], // Muzukashii / Hard
-        [1,1,1,1,1,1,1,1,1,1,1,2,3,4,4,5,5,5,6,6,7,7,8,8,8,9,9,9,10] // Oni
+        [0,2,3,4,5], // Kantan / Easy
+        [0,0,1,2,3,4,5,6,6,7], // Futsuu / Normal
+        [0,0,0,0,0,0,1,2,3,4,5,5,6,6,7,7,8], // Muzukashii / Hard
+        [1,1,1,1,1,1,1,1,1,1,2,3,4,4,5,5,5,6,6,7,7,8,8,9,9,10] // Oni
     ];
-    this.harderLevelTable = // stars below 10-star (according to xipigu), starting from lv.28
-        [1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9];
+    this.harderLevelTable = // stars below 10-star (according to xipigu), starting from lv.25
+        [1,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9];
     this.courseStrings = [
         ['kantan', 'easy'],
         ['futsuu', 'normal', 'futsu'],
         ['muzukashii', 'hard', 'muzu'],
-        ['oni', 'ura', 'inner', '+']
+        ['oni', 'mania', 'ura', 'inner', '+']
     ]
 };
 
