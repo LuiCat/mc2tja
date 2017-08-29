@@ -220,7 +220,8 @@ var mc2tja = function() {
             }
 
             // function to move beat forward by bars, or backward if a minus deltaBar value is given
-            var moveBeat = function(beat, deltaBar) {
+            // DEPRECATED, this one is based on integration
+            var moveBeatIntegrate = function(beat, deltaBar) {
                 var currSignIndex = findSignIndex(beat);
                 var currBeat = beat;
                 deltaBar = Math.round(deltaBar);
@@ -251,6 +252,45 @@ var mc2tja = function() {
                         }
                         deltaBar.dec(currBeat.cutoff(prevSignBeat).divide(sign));
                         currBeat = prevSignBeat;
+                        currSignIndex--;
+                    }
+                    return currBeat;
+                }
+            }
+            
+            // function to move beat forward by bars, or backward if a minus deltaBar value is given
+            var moveBeat = function(beat, deltaBar) {
+                var currSignIndex = findSignIndex(beat);
+                var currBeat = new Fraction(beat);
+                deltaBar = Math.round(deltaBar);
+                if (deltaBar > 0) { // go forward
+                    while (deltaBar > 0) {
+                        var nextSignBeat = currSignIndex + 1 < signs.length ? signs[currSignIndex + 1].beat : Fraction.Infinity;
+                        var sign = signs[currSignIndex].signature;
+                        var nextBeat = currBeat.add(sign);
+                        if (nextBeat.compare(nextSignBeat) <= 0) {
+                            currBeat = nextBeat;
+                            deltaBar--;
+                            continue;
+                        }
+                        deltaBar--;
+                        currBeat.inc(sign);
+                        currSignIndex++;
+                    }
+                    return currBeat;
+                } else if (deltaBar < 0) { // go backward
+                    deltaBar = -deltaBar; // absolute value
+                    while (deltaBar > 0) {
+                        var prevSignBeat = currSignIndex > 0 ? signs[currSignIndex].beat : Fraction.MinusInfinity;
+                        var sign = signs[currSignIndex].signature;
+                        var nextBeat = currBeat.cutoff(sign);
+                        if (nextBeat.compare(prevSignBeat) >= 0) {
+                            currBeat = nextBeat;
+                            deltaBar--;
+                            continue;
+                        }
+                        deltaBar--;
+                        currBeat.dec(sign);
                         currSignIndex--;
                     }
                     return currBeat;

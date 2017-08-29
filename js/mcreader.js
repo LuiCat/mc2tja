@@ -80,6 +80,8 @@ var MCReader = function() {
 				var eff = this.effect[i];
 				eff.beat = new Fraction(eff.beat);
 				//Object.setPrototypeOf(tp.beat, BeatTimeProto);
+				if (Array.isArray(eff.signature))
+					eff.signature = new Fraction(signature);
 			}
 
 		},

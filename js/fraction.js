@@ -3,10 +3,20 @@ function Fraction(initVal) {
 		this[0] = initVal[0];
 		this[1] = initVal[1];
 		this[2] = initVal[2];
-	} else if (initVal instanceof Array) {
-		this[0] = initVal[0];
-		this[1] = initVal[1];
-		this[2] = initVal[2];
+	} else if (Array.isArray(initVal)) {
+		if (initVal.length == 2) {
+			this[0] = 0;
+			this[1] = initVal[0];
+			this[2] = initVal[1];
+		} else if (initVal.length >= 3) {
+			this[0] = initVal[0];
+			this[1] = initVal[1];
+			this[2] = initVal[2];
+		} else {
+			this[0] = 0;
+			this[1] = 0;
+			this[2] = 1;
+		}
 		this.reduct();
 	} else {
 		this[0] = (typeof initVal == 'number' ? parseInt(initVal) : 0);

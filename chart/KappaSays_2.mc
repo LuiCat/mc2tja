@@ -29,7 +29,7 @@
         },
         {
             "signature": 3,
-            "beat": [262,0,1]
+            "beat": [262,1,4]
         },
         {
             "signature": 6,
