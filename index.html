@@ -79,14 +79,14 @@ html, body {
 <script src="js/tjawriter.js"></script>
 <script src="js/mc2tja.js"></script>
 <script>
-var mc = new MCReader();
-var conv = new mc2tja();
+var mc = null;
 
 function onFile() {
 	var url = $('#form-file').prop('files')[0];
 	if (!url) {
 		$('#origin-text').html('');
 	} else {
+		mc = new MCReader();
 		mc.readLocal(url, function() {
 			$('#origin-text').html(mc.text);
 			$('#btn-convert').removeAttr('disabled');
@@ -99,6 +99,7 @@ function onUrl() {
 	if (!url) {
 		$('#origin-text').html('');
 	} else {
+		mc = new MCReader();
 		mc.read(url, function() {
 			$('#origin-text').html(mc.text);
 			// TODO: mc syntax check
@@ -108,6 +109,7 @@ function onUrl() {
 }
 
 function onConvert() {
+	conv = new mc2tja();
 	conv.convert(mc, function() {
 		$('#converted-text').html(conv.generated);
 		var url = 'data:text/plain;charset=gbk,' + encodeURIComponent(conv.generated);
