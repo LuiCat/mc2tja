@@ -35,7 +35,7 @@ var mc2tja = function() {
         ['kantan', 'easy'],
         ['futsuu', 'normal', 'futsu'],
         ['muzukashii', 'hard', 'muzu'],
-        ['oni', 'mania', 'ura', 'inner', '+']
+        ['oni', 'mania', 'extreme', 'ura', 'inner', '+']
     ]
 };
 
