@@ -126,11 +126,11 @@ var mc2tja = function() {
             // get all signatures
             var signs = [];
             for (var i in mc.effect) {
-                if (mc.effect[i].signature)
-                    signs.push({signature: mc.effect[i].signature, beat: mc.effect[i].beat});
+                if (mc.effect[i].sign)
+                    signs.push({sign: mc.effect[i].sign, beat: mc.effect[i].beat});
             }
             if (signs.length == 0) // just mix the default value in default logic
-                signs.push({signature: 4, beat: new Fraction(0)});
+                signs.push({sign: 4, beat: new Fraction(0)});
             signs.sort(function(a, b) {
                 return a.beat.compare(b.beat);
             });
@@ -229,7 +229,7 @@ var mc2tja = function() {
                     deltaBar = new Fraction(deltaBar);
                     while (true) {
                         var nextSignBeat = currSignIndex + 1 < signs.length ? signs[currSignIndex + 1].beat : Fraction.Infinity;
-                        var sign = Math.round(signs[currSignIndex].signature);
+                        var sign = Math.round(signs[currSignIndex].sign);
                         var nextBeat = currBeat.add(deltaBar.time(sign));
                         if (nextBeat.compare(nextSignBeat) <= 0) {
                             currBeat = nextBeat;
@@ -244,7 +244,7 @@ var mc2tja = function() {
                     deltaBar = new Fraction(-deltaBar); // absolute value
                     while (true) {
                         var prevSignBeat = currSignIndex > 0 ? signs[currSignIndex].beat : Fraction.MinusInfinity;
-                        var sign = Math.round(signs[currSignIndex].signature);
+                        var sign = Math.round(signs[currSignIndex].sign);
                         var nextBeat = currBeat.cutoff(deltaBar.time(sign));
                         if (nextBeat.compare(prevSignBeat) >= 0) {
                             currBeat = nextBeat;
@@ -266,7 +266,7 @@ var mc2tja = function() {
                 if (deltaBar > 0) { // go forward
                     while (deltaBar > 0) {
                         var nextSignBeat = currSignIndex + 1 < signs.length ? signs[currSignIndex + 1].beat : Fraction.Infinity;
-                        var sign = signs[currSignIndex].signature;
+                        var sign = signs[currSignIndex].sign;
                         var nextBeat = currBeat.add(sign);
                         if (nextBeat.compare(nextSignBeat) <= 0) {
                             currBeat = nextBeat;
@@ -282,7 +282,7 @@ var mc2tja = function() {
                     deltaBar = -deltaBar; // absolute value
                     while (deltaBar > 0) {
                         var prevSignBeat = currSignIndex > 0 ? signs[currSignIndex].beat : Fraction.MinusInfinity;
-                        var sign = signs[currSignIndex].signature;
+                        var sign = signs[currSignIndex].sign;
                         var nextBeat = currBeat.cutoff(sign);
                         if (nextBeat.compare(prevSignBeat) >= 0) {
                             currBeat = nextBeat;
@@ -320,6 +320,7 @@ var mc2tja = function() {
                 var nextBarBeat = moveBeat(barBeat, 1);
                 var barLength = nextBarBeat.cutoff(barBeat);
                 var segmentNotes = [];
+                var segmentEvents = [];
 
                 // get note into lists and at the same time convert note styles
                 for (; noteIndex < notes.length && notes[noteIndex].beat.compare(nextBarBeat) < 0; ++noteIndex) {
@@ -340,6 +341,20 @@ var mc2tja = function() {
                     segmentNotes.push({beat: lastLongNote.cutoff(barBeat), num:'8'});
                     lastLongNote = null;
                 }
+
+                // get bpm beats into calculation
+                for (; bpmIndex < bpms.length; ++bpmIndex) {
+                    bpm = bpms[bpmIndex];
+                    if (bpm.beat >= nextBarBeat) break;
+                    segmentEvents.push({beat: bpm.beat.cutoff(barBeat), event: new TJAEvent(0, 'BPMCHANGE', bpm.bpm)});
+                }
+
+                // check measure changes
+                if (barLength.compare(lastBarLength) != 0) {
+                    var measure = barLength.divide(4);
+                    var times = (measure[2] == 1 ? 4 : measure[2] == 2 ? 2 : 1);
+                    segmentEvents.push({beat: bpm.beat.cutoff(barBeat), event: new TJAEvent(0, 'MEASURE', (measure.index() * times) + '/' + (measure[2] * times))});
+                }
                 
                 // divide beat values by bar length and calc unified denomitator
                 var denom = 1;
@@ -347,22 +362,23 @@ var mc2tja = function() {
                     segmentNotes[i].beat.normalize(barLength);
                     denom *= segmentNotes[i].beat[2] / Fraction.gcd(segmentNotes[i].beat[2], denom);
                 }
-                // TODO: get bpm beats into calculation
-                
+                for (var i in segmentEvents) {
+                    segmentEvents[i].beat.normalize(barLength);
+                    if (segmentEvents[i].beat[0] < 0) continue;
+                    denom *= segmentEvents[i].beat[2] / Fraction.gcd(segmentEvents[i].beat[2], denom);
+                }
+
                 // add notes into the segment
                 var segment = new TJASegment(denom);
                 for (var i in segmentNotes) {
                     segment.notes[segmentNotes[i].beat.index(denom)] = segmentNotes[i].num;
                 }
 
-                // check measure changes
-                if (barLength.compare(lastBarLength) != 0) {
-                    var measure = barLength.divide(4);
-                    var times = (measure[2] == 1 ? 4 : measure[2] == 2 ? 2 : 1);
-                    segment.addEvent(new TJAEvent(0, 'MEASURE', (measure.index() * times) + '/' + (measure[2] * times)));
+                for (var i in segmentEvents) {
+                    segmentEvents[i].event.index = (segmentEvents[i].beat[0] < 0 ? 0 : segmentEvents[i].beat.index(denom));
+                    segment.addEvent(segmentEvents[i].event);
                 }
 
-                // TODO: add #BPMCHANGE events
                 // TODO: add other tja events
 
                 tja.segments.push(segment);

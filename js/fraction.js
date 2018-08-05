@@ -66,7 +66,7 @@ function Fraction(initVal) {
 			this[1] %= this[2];
 			// what, a minus numerator?
 			if (this[1] < 0){
-				this[0]++;
+				this[0]--;
 				this[1] += this[2];
 			}
 			// the reduction
