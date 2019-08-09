@@ -139,6 +139,12 @@ var mc2tja = function() {
             bpms.sort(function(a, b) {
                 return a.beat.compare(b.beat);
             });
+
+            // get all effects
+            var effects = mc.effect.slice(0);
+            effects.sort(function(a, b) {
+                return a.beat.compare(b.beat);
+            });
             
             // First: fill out all necessary properties 
 
@@ -305,6 +311,7 @@ var mc2tja = function() {
 
             var noteIndex = 0;
             var bpmIndex = 0;
+            var effectIndex = 0;
             var lastBarLength = new Fraction(4);
             var lastLongNote = null;
             var balloons = [];
@@ -354,8 +361,17 @@ var mc2tja = function() {
                     var times = (measure[2] == 1 ? 4 : measure[2] == 2 ? 2 : 1);
                     segmentEvents.push({beat: new Fraction(0), event: new TJAEvent(0, 'MEASURE', (measure.index() * times) + '/' + (measure[2] * times))});
                 }
-                
-                // TODO: add other tja events
+
+                // add tja events
+                for (; effectIndex < effects.length; ++effectIndex) {
+                    effect = effects[effectIndex];
+                    if (effect.beat >= nextBarBeat) break;
+                    var beat = effect.beat.cutoff(barBeat);
+                    if (effect.hs) segmentEvents.push({beat: beat, event: new TJAEvent(0, 'SCROLL', effect.hs)});
+                    if (effect.ggt) segmentEvents.push({beat: beat, event: new TJAEvent(0, 'GOGO' + (effect.ggt ? 'START' : 'END'))});
+                    if (effect.showbar) segmentEvents.push({beat: beat, event: new TJAEvent(0, 'BARLINE' + (effect.showbar ? 'ON' : 'OFF'))});
+                    // TODO: add other tja events
+                }
                 
                 // divide beat values by bar length and calc unified denomitator
                 var denom = 1;
