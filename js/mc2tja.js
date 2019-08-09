@@ -129,8 +129,7 @@ var mc2tja = function() {
                 if (mc.effect[i].sign)
                     signs.push({sign: mc.effect[i].sign, beat: mc.effect[i].beat});
             }
-            if (signs.length == 0) // just mix the default value in default logic
-                signs.push({sign: 4, beat: new Fraction(0)});
+            signs.unshift({sign: 4, beat: Fraction.MinusInfinity});
             signs.sort(function(a, b) {
                 return a.beat.compare(b.beat);
             });
@@ -353,8 +352,10 @@ var mc2tja = function() {
                 if (barLength.compare(lastBarLength) != 0) {
                     var measure = barLength.divide(4);
                     var times = (measure[2] == 1 ? 4 : measure[2] == 2 ? 2 : 1);
-                    segmentEvents.push({beat: bpm.beat.cutoff(barBeat), event: new TJAEvent(0, 'MEASURE', (measure.index() * times) + '/' + (measure[2] * times))});
+                    segmentEvents.push({beat: new Fraction(0), event: new TJAEvent(0, 'MEASURE', (measure.index() * times) + '/' + (measure[2] * times))});
                 }
+                
+                // TODO: add other tja events
                 
                 // divide beat values by bar length and calc unified denomitator
                 var denom = 1;
@@ -378,8 +379,6 @@ var mc2tja = function() {
                     segmentEvents[i].event.index = (segmentEvents[i].beat[0] < 0 ? 0 : segmentEvents[i].beat.index(denom));
                     segment.addEvent(segmentEvents[i].event);
                 }
-
-                // TODO: add other tja events
 
                 tja.segments.push(segment);
 
