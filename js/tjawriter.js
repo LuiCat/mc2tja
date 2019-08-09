@@ -53,7 +53,6 @@ var TJASegment = function(initSize) {
             
             var i_event = 0;
             var event = this.events.length == 0 ? null : this.events[0];
-            var needBreakLine = false;
             var eventAtBegin = true;
             for (var index = 0; index < this.size; ++index) {
                 var note = this.notes[index] || '0';
@@ -63,13 +62,9 @@ var TJASegment = function(initSize) {
                         res += '\r\n';
                     }
                     res += event;
+                    res += '\r\n';
                     ++i_event;
                     event = i_event < this.events.length ? this.events[i_event] : null;
-                    needBreakLine = true;
-                }
-                if (needBreakLine) {
-                    res += '\r\n';
-                    needBreakLine = false;
                 }
                 res += note;
             }
@@ -81,7 +76,7 @@ var TJASegment = function(initSize) {
                 if (!event.keepLine)
                     res += '\r\n';
                 res += event;
-                needBreakLine = true;
+                res += '\r\n';
             }
 
             return res;
