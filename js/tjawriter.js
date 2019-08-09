@@ -53,14 +53,14 @@ var TJASegment = function(initSize) {
             
             var i_event = 0;
             var event = this.events.length == 0 ? null : this.events[0];
-            var eventAtBegin = true;
             for (var index = 0; index < this.size; ++index) {
                 var note = this.notes[index] || '0';
+                var firstEventInBatch = true;
                 while (event && event.index <= index) {
-                    if (!(event.keepLine || (eventAtBegin && index == 0))) {
-                        eventAtBegin = false;
+                    if (!event.keepLine && firstEventInBatch && index != 0) {
                         res += '\r\n';
                     }
+                    firstEventInBatch = false;
                     res += event;
                     res += '\r\n';
                     ++i_event;
