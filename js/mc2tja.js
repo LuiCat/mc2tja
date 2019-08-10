@@ -159,7 +159,7 @@ var mc2tja = function() {
             if (mc.mainSample) {
                 tja.prop('WAVE', mc.mainSample.sound);
                 // calculate the real offset & preview offset
-                var offset = 0;
+                var offset = -0.001 * (mc.mainSample.offset || 0);
                 var lastBPM = mc.initTime.bpm;
                 var lastBeat = mc.mainSample.beat;
                 for (var i in bpms) {
@@ -172,7 +172,7 @@ var mc2tja = function() {
                     lastBPM = bpms[i].bpm;
                     lastBeat = bpms[i].beat;
                 }
-                offset += (barBegin - lastBeat) * 60 / lastBPM - 0.001 * mc.mainSample.offset;
+                offset += (barBegin - lastBeat) * 60 / lastBPM;
                 tja.prop('OFFSET', (-offset).toFixed(3));
                 tja.prop('DEMOSTART', (mc.meta.preview ? 0.001 * mc.meta.preview : offset).toFixed(3));
             }
