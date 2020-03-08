@@ -18,10 +18,13 @@ function Fraction(initVal) {
 			this[2] = 1;
 		}
 		this.reduct();
-	} else {
-		this[0] = (typeof initVal == 'number' ? parseInt(initVal) : 0);
-		this[1] = 0;
-		this[2] = 1;
+	} else if (typeof initVal == 'number') {
+		var x = parseFloat(initVal);
+		var xi = Math.floor(x);
+		this[0] = xi;
+		this[1] = Math.round((x - xi) * 288);
+		this[2] = 288;
+		this.reduct();
 	}
 }
 
