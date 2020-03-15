@@ -80,7 +80,12 @@ var MCReader = function() {
 				var eff = this.effect[i];
 				eff.beat = new Fraction(eff.beat);
 				//Object.setPrototypeOf(tp.beat, BeatTimeProto);
-				eff.sign = new Fraction(eff.sign);
+				if ("sign" in eff) {
+					eff.sign = new Fraction(eff.sign);
+					if (!eff.sign.isValid()) {
+						eff.sign = null;
+					}
+				}
 			}
 
 		},

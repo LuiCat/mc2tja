@@ -47,6 +47,10 @@ function Fraction(initVal) {
 	Fraction.gcd = gcd;
     
     Fraction.prototype = {
+		isValid: function() {
+			return isFinite(this[0]) && isFinite(this[1]) && isFinite(this[2]);
+		},
+
 		// override default behavior in converting a fraction to a number
 		valueOf: function() {
 			return this[0] + this[1] / (this[2] > 0 ? this[2] : 1);
