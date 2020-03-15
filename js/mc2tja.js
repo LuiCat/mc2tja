@@ -367,9 +367,9 @@ var mc2tja = function() {
                     effect = effects[effectIndex];
                     if (effect.beat >= nextBarBeat) break;
                     var beat = effect.beat.cutoff(barBeat);
-                    if (effect.hs) segmentEvents.push({beat: beat, event: new TJAEvent(0, 'SCROLL', effect.hs)});
-                    if (effect.ggt) segmentEvents.push({beat: beat, event: new TJAEvent(0, 'GOGO' + (effect.ggt ? 'START' : 'END'))});
-                    if (effect.showbar) segmentEvents.push({beat: beat, event: new TJAEvent(0, 'BARLINE' + (effect.showbar ? 'ON' : 'OFF'))});
+                    if ("hs" in effect) segmentEvents.push({beat: beat, event: new TJAEvent(0, 'SCROLL', effect.hs)});
+                    if ("ggt" in effect) segmentEvents.push({beat: beat, event: new TJAEvent(0, 'GOGO' + (effect.ggt ? 'START' : 'END'))});
+                    if ("showbar" in effect) segmentEvents.push({beat: beat, event: new TJAEvent(0, 'BARLINE' + (effect.showbar ? 'ON' : 'OFF'))});
                     // TODO: add other tja events
                 }
                 
