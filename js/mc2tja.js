@@ -155,6 +155,10 @@ var mc2tja = function() {
                 tja.prop('AUTHOR', mc.meta.creator);
                 tja.prop('COVER', mc.meta.background);
             }
+            
+            if (mc.initTime) {
+                tja.prop('BPM', mc.initTime.bpm);
+            }
 
             if (mc.mainSample) {
                 tja.prop('WAVE', mc.mainSample.sound);
@@ -176,9 +180,7 @@ var mc2tja = function() {
                 tja.prop('OFFSET', (-offset).toFixed(3));
                 tja.prop('DEMOSTART', (mc.meta.preview ? 0.001 * mc.meta.preview : offset).toFixed(3));
             }
-            if (mc.initTime) {
-                tja.prop('BPM', mc.initTime.bpm);
-            }
+            
             tja.prop('SONGVOL', 100);
             tja.prop('SEVOL', 100);
 
