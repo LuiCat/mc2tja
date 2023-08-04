@@ -92,6 +92,10 @@ var mc2tja = function() {
             return style.toString();
         },
 
+        roundDoubleToReadable: function(x) {
+            return x.toFixed(6) * 1;
+        },
+
         convert: function(mc, onsuccess) {
             if (typeof mc == 'string') { // mc text content
                 var text = mc;
@@ -157,7 +161,7 @@ var mc2tja = function() {
             }
             
             if (mc.initTime) {
-                tja.prop('BPM', mc.initTime.bpm);
+                tja.prop('BPM', roundDoubleToReadable(mc.initTime.bpm));
             }
 
             if (mc.mainSample) {
@@ -354,7 +358,7 @@ var mc2tja = function() {
                 for (; bpmIndex < bpms.length; ++bpmIndex) {
                     bpm = bpms[bpmIndex];
                     if (bpm.beat >= nextBarBeat) break;
-                    segmentEvents.push({beat: bpm.beat.cutoff(barBeat), event: new TJAEvent(0, 'BPMCHANGE', bpm.bpm)});
+                    segmentEvents.push({beat: bpm.beat.cutoff(barBeat), event: new TJAEvent(0, 'BPMCHANGE', roundDoubleToReadable(bpm.bpm))});
                 }
 
                 // check measure changes
@@ -369,7 +373,7 @@ var mc2tja = function() {
                     effect = effects[effectIndex];
                     if (effect.beat >= nextBarBeat) break;
                     var beat = effect.beat.cutoff(barBeat);
-                    if ("hs" in effect) segmentEvents.push({beat: beat, event: new TJAEvent(0, 'SCROLL', effect.hs)});
+                    if ("hs" in effect) segmentEvents.push({beat: beat, event: new TJAEvent(0, 'SCROLL', roundDoubleToReadable(effect.hs))});
                     if ("ggt" in effect) segmentEvents.push({beat: beat, event: new TJAEvent(0, 'GOGO' + (effect.ggt ? 'START' : 'END'))});
                     if ("showbar" in effect) segmentEvents.push({beat: beat, event: new TJAEvent(0, 'BARLINE' + (effect.showbar ? 'ON' : 'OFF'))});
                     // TODO: add other tja events
