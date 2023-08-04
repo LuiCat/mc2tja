@@ -145,7 +145,7 @@ var mc2tja = function() {
             });
 
             // get all effects
-            var effects = mc.effect.slice(0);
+            var effects = mc.effect ? mc.effect.slice(0) : [];
             effects.sort(function(a, b) {
                 return a.beat.compare(b.beat);
             });
